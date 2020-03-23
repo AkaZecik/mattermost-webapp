@@ -14,48 +14,25 @@ import LoadingScreen from 'components/loading_screen';
 
 import * as GlobalActions from 'actions/global_actions.jsx';
 
-export default class DoVerifyEmail extends React.PureComponent {
-    static propTypes = {
+type Props = {
+    location: { // Object with validation parameters given in link
+        search: string;
+    };
+    sitename?: string; // Title of the app or site.
+    actions: { // Object with redux action creators
+        verifyUserEmail: () => void; // Action creator to verify the user's email
+        getMe: () => void; // Action creator to update the user in the redux store
+        logError: () => void;
+        clearErrors: () => void;
+    };
+    user?: { // Object representing the current user
+        email_verifies: boolean;
+    };
+    isLoggedIn: boolean;
+}
 
-        /**
-         * Object with validation parameters given in link
-         */
-        location: PropTypes.object.isRequired,
-
-        /**
-         * Title of the app or site.
-         */
-        siteName: PropTypes.string,
-
-        /*
-         * Object with redux action creators
-         */
-        actions: PropTypes.shape({
-
-            /*
-             * Action creator to verify the user's email
-             */
-            verifyUserEmail: PropTypes.func.isRequired,
-
-            /*
-             * Action creator to update the user in the redux store
-             */
-            getMe: PropTypes.func.isRequired,
-            logError: PropTypes.func.isRequired,
-            clearErrors: PropTypes.func.isRequired,
-        }).isRequired,
-
-        /**
-         * Object reprenseting the current user
-         */
-        user: PropTypes.shape({
-            email_verified: PropTypes.bool,
-        }),
-
-        isLoggedIn: PropTypes.bool.isRequired,
-    }
-
-    constructor(props) {
+export default class DoVerifyEmail extends React.PureComponent<Props> {
+    constructor(props: Props) {
         super(props);
 
         this.state = {
@@ -121,6 +98,7 @@ export default class DoVerifyEmail extends React.PureComponent {
     }
 
     verifyEmail = async () => {
+        const hehe: URLSearchParams = new URLSearchParams('?hello=world');
         const {actions: {verifyUserEmail}} = this.props;
         const verify = await verifyUserEmail((new URLSearchParams(this.props.location.search)).get('token'));
 
