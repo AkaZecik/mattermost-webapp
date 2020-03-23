@@ -7,7 +7,7 @@ import {Modal} from 'react-bootstrap';
 
 import {browserHistory} from 'utils/browser_history';
 
-import DeletePostModal from 'components/delete_post_modal/delete_post_modal.jsx';
+import DeletePostModal from 'components/delete_post_modal/delete_post_modal';
 
 jest.mock('utils/browser_history', () => ({
     browserHistory: {
@@ -74,10 +74,10 @@ describe('components/delete_post_modal', () => {
             <DeletePostModal {...baseProps}/>
         );
 
-        const deletePostBtn = {focus: jest.fn()};
-        wrapper.instance().deletePostBtn = deletePostBtn;
+        const deletePostBtn = {focus: jest.fn()} as unknown as HTMLButtonElement;
+        (wrapper.instance() as DeletePostModal).deletePostBtn = deletePostBtn;
 
-        wrapper.instance().handleEntered();
+        (wrapper.instance() as DeletePostModal).handleEntered();
         expect(deletePostBtn.focus).toHaveBeenCalled();
     });
 
@@ -87,7 +87,7 @@ describe('components/delete_post_modal', () => {
         );
 
         wrapper.setState({show: true});
-        wrapper.instance().onHide();
+        (wrapper.instance() as DeletePostModal).onHide();
         expect(wrapper.state('show')).toEqual(false);
     });
 
@@ -117,7 +117,7 @@ describe('components/delete_post_modal', () => {
         );
 
         wrapper.setState({show: true});
-        wrapper.instance().handleDelete();
+        (wrapper.instance() as DeletePostModal).handleDelete();
 
         await expect(deleteAndRemovePost).toHaveBeenCalledTimes(1);
         expect(deleteAndRemovePost).toHaveBeenCalledWith(props.post);
@@ -141,7 +141,7 @@ describe('components/delete_post_modal', () => {
         );
 
         wrapper.setState({show: true});
-        wrapper.instance().handleDelete();
+        (wrapper.instance() as DeletePostModal).handleDelete();
         await expect(deleteAndRemovePost).toHaveBeenCalledTimes(1);
         expect(browserHistory.replace).toHaveBeenCalledWith('/teamname/messages/@username');
     });
@@ -163,7 +163,7 @@ describe('components/delete_post_modal', () => {
         );
 
         wrapper.setState({show: true});
-        wrapper.instance().handleDelete();
+        (wrapper.instance() as DeletePostModal).handleDelete();
         await expect(deleteAndRemovePost).toHaveBeenCalledTimes(1);
         expect(browserHistory.replace).toHaveBeenCalledWith('/teamname/channels/channelName');
     });
@@ -175,7 +175,7 @@ describe('components/delete_post_modal', () => {
             <DeletePostModal {...props}/>
         );
 
-        wrapper.find(Modal).props().onExited();
+        wrapper.find(Modal).props().onExited!(document.createElement('div'));
         expect(onHide).toHaveBeenCalledTimes(1);
     });
 });

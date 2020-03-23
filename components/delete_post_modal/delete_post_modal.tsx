@@ -1,7 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import PropTypes from 'prop-types';
 import React from 'react';
 import {Modal} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
@@ -13,20 +12,35 @@ import {browserHistory} from 'utils/browser_history';
 const urlFormatForDMGMPermalink = '/:teamName/messages/:username/:postid';
 const urlFormatForChannelPermalink = '/:teamName/channels/:channelname/:postid';
 
-export default class DeletePostModal extends React.PureComponent {
-    static propTypes = {
-        channelName: PropTypes.string,
-        teamName: PropTypes.string,
-        post: PropTypes.object.isRequired,
-        commentCount: PropTypes.number.isRequired,
-        isRHS: PropTypes.bool.isRequired,
-        onHide: PropTypes.func.isRequired,
-        actions: PropTypes.shape({
-            deleteAndRemovePost: PropTypes.func.isRequired,
-        }),
-    }
+interface Post {
+    id: string;
+    root_id: string;
+}
 
-    constructor(props) {
+interface Props {
+    channelName?: string;
+    teamName?: string;
+    post: Post;
+    commentCount: number;
+    isRHS: boolean;
+    onHide: () => void;
+    actions: {
+        deleteAndRemovePost: (post: Post) => {
+            data: object;
+        };
+    };
+    location?: {
+        pathname: string;
+    };
+}
+
+type State = {
+    show: boolean;
+};
+
+export default class DeletePostModal extends React.PureComponent<Props, State> {
+    deletePostBtn: HTMLButtonElement | null | undefined;
+    constructor(props: Props) {
         super(props);
         this.state = {
             show: true,
@@ -42,12 +56,13 @@ export default class DeletePostModal extends React.PureComponent {
         let permalinkPostId = '';
 
         const result = await actions.deleteAndRemovePost(post);
+        const pathname = (this.props.location && this.props.location.pathname) || '';
 
-        const matchUrlForDMGM = matchPath(this.props.location.pathname, {
+        const matchUrlForDMGM = matchPath<{postid: string}>(pathname, {
             path: urlFormatForDMGMPermalink,
         });
 
-        const matchUrlForChannel = matchPath(this.props.location.pathname, {
+        const matchUrlForChannel = matchPath<{postid: string}>(pathname, {
             path: urlFormatForChannelPermalink,
         });
 
@@ -58,26 +73,26 @@ export default class DeletePostModal extends React.PureComponent {
         }
 
         if (permalinkPostId === post.id) {
-            const channelUrl = this.props.location.pathname.split('/').slice(0, -1).join('/');
+            const channelUrl = pathname.split('/').slice(0, -1).join('/');
             browserHistory.replace(channelUrl);
         }
 
         if (result.data) {
             this.onHide();
         }
-    }
+    };
 
     handleEntered = () => {
         if (this.deletePostBtn) {
             this.deletePostBtn.focus();
         }
-    }
+    };
 
     onHide = () => {
         this.setState({show: false});
 
         if (!UserAgent.isMobile()) {
-            var element;
+            let element;
             if (this.props.isRHS) {
                 element = document.getElementById('reply_textbox');
             } else {
@@ -87,10 +102,10 @@ export default class DeletePostModal extends React.PureComponent {
                 element.focus();
             }
         }
-    }
+    };
 
     render() {
-        var commentWarning = '';
+        let commentWarning: string | JSX.Element = '';
         if (this.props.commentCount > 0 && this.props.post.root_id === '') {
             commentWarning = (
                 <FormattedMessage
