@@ -23,7 +23,7 @@ describe('comoponents/rhs_card/RhsCard', () => {
     it('should match when no post is selected', () => {
         const wrapper = shallow(
             <RhsCard
-                selected={null}
+                selected={undefined}
                 channel={currentChannel}
             />,
         );
