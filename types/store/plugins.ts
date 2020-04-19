@@ -31,20 +31,20 @@ export type PluginsState = {
 export type PluginComponent = {
     id: string;
     pluginId: string;
-    component: React.Component;
+    component: typeof React.Component;
 };
 
 export type PostPluginComponent = {
     id: string;
     pluginId: string;
     type: string;
-    component: React.Component;
+    component: typeof React.Component;
 };
 
 export type AdminConsolePluginComponent = {
     pluginId: string;
     key: string;
-    component: React.Component;
+    component: typeof React.Component;
     options: {
         showTitle: boolean;
     };
